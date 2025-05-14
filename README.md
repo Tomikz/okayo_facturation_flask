@@ -31,7 +31,7 @@ pip install -r requirements.txt
 python init_db.py
 
 
-Voici les données initialisées
+Voici les données initialisées : 
 
 - Le compte OKAYO pour le solde
 - Le client Mon client SAS avec adresse
