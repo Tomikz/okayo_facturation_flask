@@ -14,6 +14,7 @@ Pour installer et tester le projet voici les étapes à suivre :
 1) Cloner le dépôt :
 
 git clone https://github.com/Tomikz/okayo_facturation_flask.git
+
 cd okayo_facturation_flask
 
 2) On crée un environnement virtuel:
