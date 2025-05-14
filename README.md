@@ -20,7 +20,9 @@ cd okayo_facturation_flask
 2) On crée un environnement virtuel:
 
 python -m venv venv
+
 source venv/bin/activate  # pour linux/macOS
+
 venv\Scripts\activate     # pour windows
 
 3. On Installe les dépendances:
