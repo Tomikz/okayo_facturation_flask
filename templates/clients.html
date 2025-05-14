@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block title %}Clients{% endblock %}
+
+{% block content %}
+    <h2>Liste des clients</h2>
+
+    <table border="1" cellpadding="6">
+        <tr>
+            <th>ID</th>
+            <th>Code</th>
+            <th>Nom</th>
+            <th>Adresse</th>
+        </tr>
+        {% for client in clients %}
+        <tr>
+            <td>{{ client.idClient }}</td>
+            <td>{{ client.codeClient }}</td>
+            <td>{{ client.nomClient }}</td>
+            <td>{{ client.adresse }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <hr>
+
+    <h3>Ajouter un client</h3>
+    <form method="POST">
+        <label>Code client : <input type="text" name="codeClient" required></label><br>
+        <label>Nom client : <input type="text" name="nomClient" required></label><br>
+        <label>Adresse : <input type="text" name="adresse" required></label><br>
+        <input type="submit" value="Ajouter le client">
+    </form>
+{% endblock %}

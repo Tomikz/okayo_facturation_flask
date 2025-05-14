@@ -1,0 +1,116 @@
+{% extends "layout.html" %}
+
+{% block title %}Catalogue des produits{% endblock %}
+
+{% block content %}
+    <h2>Catalogue des produits</h2>
+
+    
+
+    <table border="1" cellpadding="6">
+        <tr>
+            <th>ID</th>
+            <th>Désignation</th>
+            <th>Prix UHT (€)</th>
+            <th>TVA (%)</th>
+            <th>Actions</th>
+        </tr>
+        {% for produit in produits %}
+        <tr>
+            <td>{{ produit.idProduit }}</td>
+            <td>{{ produit.designation }}</td>
+            <td>{{ produit.prixUHT }}</td>
+            <td>{{ tvas[produit.idTVA] }}</td>
+            <td>
+                <form method="POST" action="{{ url_for('supprimer_produit', id=produit.idProduit) }}" style="display:inline;">
+                    <button type="submit" onclick="return confirm('Supprimer ce produit ?')">Supprimer</button>
+                </form>
+                <button onclick="document.getElementById('edit-form-{{ produit.idProduit }}').style.display='table-row'">Modifier</button>
+            </td>
+        </tr>
+        <tr id="edit-form-{{ produit.idProduit }}" style="display:none; background-color:#f9f9f9;">
+            <td colspan="6">
+                <form method="POST" action="{{ url_for('modifier_produit', id=produit.idProduit) }}">
+                    <label>Désignation : <input type="text" name="designation" value="{{ produit.designation }}" required></label>
+                    <label>Prix UHT : <input type="number" step="0.01" name="prixUHT" value="{{ produit.prixUHT }}" required></label>
+                    <label>TVA :
+                        <select name="idTVA">
+                            {% for id, taux in tvas.items() %}
+                            <option value="{{ id }}" {% if produit.idTVA == id %}selected{% endif %}>{{ taux }}%</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    <button type="submit">Enregistrer</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <hr>
+
+    <h3>Ajouter un produit</h3>
+    <form method="POST">
+        <input type="hidden" name="form_type" value="produit">
+        <label>Désignation : <input type="text" name="designation" required></label><br>
+        <label>Prix UHT : <input type="number" step="0.01" name="prixUHT" required></label><br>
+        <label>TVA :
+            <select name="idTVA" required>
+                {% for id, taux in tvas.items() %}
+                <option value="{{ id }}">{{ taux }}%</option>
+                {% endfor %}
+            </select>
+        </label><br>
+        <input type="submit" value="Ajouter le produit">
+    </form>
+
+    <hr>
+
+    <h3>Ajouter un taux de TVA</h3>
+    <form method="POST">
+        <input type="hidden" name="form_type" value="tva">
+        <label>Taux (%) : <input type="number" name="taux" step="0.01" required></label><br>
+        <label>Date de début : <input type="date" name="dateDebut" required></label><br>
+        <label>Date de fin : <input type="text" name="dateFin" placeholder="(facultatif)"></label><br>
+        <input type="submit" value="Ajouter la TVA">
+    </form>
+
+    <hr>
+
+    <h3>Liste des taux de TVA existants</h3>
+    <table border="1" cellpadding="6">
+        <tr>
+            <th>ID</th>
+            <th>Taux</th>
+            <th>Date début</th>
+            <th>Date fin</th>
+            <th>Actions</th>
+        </tr>
+        {% for id, taux in tvas.items() %}
+        {% set tva_obj = tva_list | selectattr('idTVA', 'equalto', id) | list | first %}
+        <tr>
+            <td>{{ id }}</td>
+            <td>{{ taux }}</td>
+            <td>{{ tva_obj.dateDebut }}</td>
+            <td>{{ tva_obj.dateFin or "-" }}</td>
+            <td>
+                <form method="POST" action="{{ url_for('supprimer_tva', id=id) }}" style="display:inline;">
+                    <button type="submit" onclick="return confirm('Supprimer cette TVA ?')">Supprimer</button>
+                </form>
+                <button onclick="document.getElementById('edit-tva-{{ id }}').style.display='table-row'">Modifier</button>
+            </td>
+        </tr>
+        <tr id="edit-tva-{{ id }}" style="display:none; background-color:#f0f0f0;">
+            <td colspan="5">
+                <form method="POST" action="{{ url_for('modifier_tva', id=id) }}">
+                    <label>Taux : <input type="number" step="0.01" name="taux" value="{{ taux }}" required></label>
+                    <label>Date début : <input type="date" name="dateDebut" value="{{ tva_obj.dateDebut }}" required></label>
+                    <label>Date fin : <input type="text" name="dateFin" value="{{ tva_obj.dateFin or '' }}"></label>
+                    <button type="submit">Enregistrer</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+{% endblock %}

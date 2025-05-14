@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}OKAYO{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="navbar-left">
+            <a href="{{ url_for('index') }}">Prestations</a>
+            <a href="{{ url_for('clients') }}">Clients</a>
+            <a href="{{ url_for('factures') }}">Factures</a>
+            <a href="{{ url_for('catalogue') }}">Catalogue/TVA</a>
+        </div>
+        <div class="navbar-right">
+            <div class="solde">🪙 {{ '%.2f'|format(solde or 0.0) }} €</div>
+        </div>
+    </div>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+</body>
+</html>

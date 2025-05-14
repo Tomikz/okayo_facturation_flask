@@ -1,0 +1,96 @@
+
+
+
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/facture.css') }}">
+
+<div class="facture-container">
+
+    <div class="facture-header">
+        <img src="{{ url_for('static', filename='medias/logo.png') }}" class="facture-logo">
+        <div class="facture-titre">
+            <h2>Facture</h2>
+            <p><strong>Réf. :</strong> {{ facture.refFacture }}</p>
+            <p><strong>Date facturation :</strong> {{ facture.dateFacturation }}</p>
+            <p><strong>Date échéance :</strong> {{ facture.dateEcheance }}</p>
+            <p><strong>Code client :</strong> {{ client.codeClient }}</p>
+        </div>
+    </div>
+
+    
+    <div class="flex-rects">
+        <div class="bloc-rect rect-left">
+            <strong>Émetteur :</strong><br>
+            OKAYO SAS<br>
+            35 Rue du Général Foy<br>
+            75008 Paris<br>
+            Tél. : 01 80 88 63 00<br>
+            Web: www.okayo.fr
+        </div>
+
+        <div class="bloc-rect rect-right">
+            <strong>Adressé à :</strong><br>
+            {{ client.nomClient }}<br>
+            {{ client.adresse }}
+        </div>
+    </div>
+
+    <!--tableau pour les produits -->
+    <table class="table-produits">
+        <thead>
+            <tr>
+                <th>Désignation</th>
+                <th>TVA</th>
+                <th>P.U. HT</th>
+                <th>Qté</th>
+                <th>Total HT</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ligne in lignes %}
+            <tr>
+                <td>{{ ligne.designation }}</td>
+                <td>{{ ligne.tva }}%</td>
+                <td>{{ '%.2f'|format(ligne.prixUHT) }} €</td>
+                <td>{{ ligne.quantite }}</td>
+                <td>{{ '%.2f'|format(ligne.totalHT) }} €</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="total-section">
+    <!-- partie pour en dessous du tableau (les conditions de règlement + TVAs) -->
+        <div class="conditions">
+            <div style="display: flex; justify-content: space-between;">
+                <strong>Conditions de règlement :</strong>
+                <span><strong>Total HT :</strong> {{ '%.2f'|format(facture.totalHTFacture) }} €</span>
+            </div>
+
+            {{ facture.conditionReglement }}<br><br>
+            <strong>Règlement par virement sur le compte bancaire suivant :</strong><br>
+            Domiciliation : {{ compte.domiciliation or '—' }}<br>
+            Nom du propriétaire du compte : {{ compte.nomCompte or '—' }}<br>
+            <strong>Code IBAN :</strong> {{ compte.codeIBAN or '—' }}<br>
+            <strong>Code BIC/SWIFT :</strong> {{ compte.codeBIC or '—' }}
+        </div>
+
+        <!-- somme des TVAs (et total ttc) -->
+        <div class="tvas">
+            <strong>Montants TVA :</strong><br><br>
+            {% for taux, montant in tva_totaux.items() %}
+                Total TVA {{ taux }}% : {{ '%.2f'|format(montant) }} €<br>
+            {% endfor %}
+            <div class="total-bloc">
+                Total TTC : {{ '%.2f'|format(facture.totalTTC) }} €
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top: 30px;">
+        <a href="{{ url_for('factures') }}">⬅Retour à la liste des factures</a>
+    </div>
+
+</div>
+{% endblock %}

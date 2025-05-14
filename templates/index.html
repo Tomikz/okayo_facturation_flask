@@ -1,0 +1,107 @@
+{% extends "layout.html" %}
+
+{% block title %}Accueil - OKAYO{% endblock %}
+
+{% block content %}
+<h2>Créer une facture</h2>
+
+<!-- Formulaire principal -->
+<form id="facture-form">
+
+    <label>Client :
+        <select name="idClient" required>
+            {% for client in clients %}
+            <option value="{{ client.idClient }}">{{ client.nomClient }}</option>
+            {% endfor %}
+        </select>
+    </label><br>
+    <label>Date de facturation : <input type="date" name="dateFacturation" required></label><br>
+    <label>Date d’échéance : <input type="date" name="dateEcheance" required></label><br>
+    <label>Condition de règlement :
+        <input type="text" name="conditionReglement" required>
+    </label><br>
+    <button type="button" onclick="ouvrirPopup()">Créer la facture</button>
+</form>
+
+<!-- Pop-up produit -->
+<div id="popup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
+    <div style="background:white; padding:20px; border-radius:10px; max-width:600px; width:90%;">
+        <h3>Ajouter les produits à la facture</h3>
+        <form id="popup-form">
+            <table border="1" cellpadding="5">
+                <tr>
+                    <th>Sélection</th>
+                    <th>Produit</th>
+                    <th>Prix UHT</th>
+                    <th>Quantité</th>
+                </tr>
+                {% for produit in produits %}
+                <tr>
+                    <td><input type="checkbox" name="produits" value="{{ produit.idProduit }}"></td>
+                    <td>{{ produit.designation }}</td>
+                    <td>{{ produit.prixUHT }}</td>
+                    <td>
+                        <input type="number" name="quantite_{{ produit.idProduit }}" min="1" value="1" style="width:60px;">
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+            <br>
+            <button type="button" onclick="envoyerFacture()">Valider</button>
+            <button type="button" onclick="fermerPopup()">Annuler</button>
+        </form>
+    </div>
+</div>
+
+<script>
+function ouvrirPopup() {
+    const form = document.getElementById('facture-form');
+
+    // Validation native HTML5
+    if (!form.checkValidity()) {
+        form.reportValidity(); // Affiche les messages du navigateur
+        return;
+    }
+
+    // Tous les champs sont bons → afficher le pop-up
+    document.getElementById('popup').style.display = 'flex';
+}
+
+function fermerPopup() {
+    document.getElementById('popup').style.display = 'none';
+}
+
+function envoyerFacture() {
+    const formPrincipale = document.getElementById('facture-form');
+    const formPopup = document.getElementById('popup-form');
+
+    // Vérification sélection produit
+    const produitsCoches = formPopup.querySelectorAll('input[name="produits"]:checked');
+    if (produitsCoches.length === 0) {
+        alert("Veuillez sélectionner au moins un produit.");
+        return;
+    }
+
+    // Préparation de l'envoi
+    const formData = new FormData(formPrincipale);
+    produitsCoches.forEach(p => {
+        const id = p.value;
+        const qte = formPopup.querySelector(`[name="quantite_${id}"]`).value;
+        formData.append('produits[]', id);
+        formData.append(`quantite_${id}`, qte);
+    });
+
+    fetch("/", {
+        method: "POST",
+        body: formData
+    }).then(response => {
+        if (response.redirected) {
+            window.location.href = response.url;
+        } else {
+            alert("Erreur lors de la création de la facture.");
+        }
+    });
+}
+</script>
+{% endblock %}

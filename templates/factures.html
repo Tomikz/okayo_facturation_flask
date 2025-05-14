@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+
+{% block title %}Factures - OKAYO{% endblock %}
+
+{% block content %}
+    <h2>Liste des factures</h2>
+
+    <form method="get">
+        <label for="client_id">Filtrer par client :</label>
+        <select name="client_id" id="client_id" onchange="this.form.submit()">
+            <option value="">Tous les clients </option>
+            {% for client in clients %}
+                <option value="{{ client.idClient }}" {% if client_id == client.idClient %}selected{% endif %}>
+                    {{ client.nomClient }}
+                </option>
+            {% endfor %}
+        </select>
+    </form>
+
+    <br>
+
+    {% if factures %}
+    <table border="1" cellpadding="6">
+        <tr>
+            <th>Référence</th>
+            <th>Client</th>
+            <th>Date</th>
+            <th>Montant HT</th>
+            <th>Montant TTC</th>
+            <th>Détail</th>
+            <th>Supprimer</th>
+        </tr>
+        {% for f in factures %}
+        <tr>
+            <td>{{ f.refFacture }}</td>
+            <td>{{ client_dict[f.idClient] }}</td>
+            <td>{{ f.dateFacturation }}</td>
+            <td>{{ f.totalHTFacture }} €</td>
+            <td>{{ f.totalTTC }} €</td>
+            <td><a href="{{ url_for('facture_detail', id=f.idFacture) }}">voir</a></td>
+            <td>
+                <form method="post" action="{{ url_for('supprimer_facture', id=f.idFacture) }}" onsubmit="return confirm('Supprimer cette facture ?');">
+                    <button type="submit">x</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+        <p>Aucune facture trouvée.</p>
+    {% endif %}
+{% endblock %}
